@@ -1,0 +1,17 @@
+seed: 7
+dt_ms: 1.0
+brain_body_sync_ms: 15.0
+steps: 220
+arena_radius: 2.0
+food_position: [1.25, 0.35]
+sensor_offset: 0.16
+sensor_angle_deg: 32.0
+gradient_sigma: 0.75
+dust_gain: 0.003
+groom_clean_rate: 0.07
+max_linear_speed: 0.035
+max_turn_rate: 0.14
+hunger_drive: 0.43
+forward_softclip_center: 0.68
+forward_softclip_slope: 3.2
+turn_softclip_gain: 1.3
