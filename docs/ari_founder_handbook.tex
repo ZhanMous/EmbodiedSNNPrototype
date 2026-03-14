@@ -1,0 +1,293 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=1.8cm]{geometry}
+\usepackage{fontspec}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{setspace}
+\usepackage{xcolor}
+\usepackage{parskip}
+
+\setmainfont{DejaVu Serif}
+\setsansfont{DejaVu Sans}
+\setmonofont{DejaVu Sans Mono}
+\emergencystretch=2em
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!50!black,
+  urlcolor=blue!50!black,
+  pdftitle={ARI Founder Handbook},
+  pdfauthor={GitHub Copilot}
+}
+
+\setstretch{1.08}
+\setlist[itemize]{leftmargin=1.6em,itemsep=0.25em,topsep=0.35em}
+\setlist[enumerate]{leftmargin=1.8em,itemsep=0.25em,topsep=0.35em}
+\titleformat{\section}{\large\bfseries}{}{0em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{}{0em}{}
+
+\title{ARI Founder Handbook\\\large Foundations, Taste, Execution, and Architecture}
+\author{}
+\date{March 12, 2026}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Purpose of This Handbook}
+
+This handbook is written for a serious builder who wants to train judgment, not just accumulate information.
+
+Its governing idea is simple:
+
+\begin{itemize}
+  \item purpose decides what is worth dedicating your life to
+  \item will decides whether you can endure difficulty
+  \item taste decides what is real, deep, reusable, and worthy
+\end{itemize}
+
+Purpose without taste becomes fanaticism. Will without taste becomes waste. Taste is what lets you choose the right mountain.
+
+\section{What Taste Means}
+
+In this context, taste is not preference. It is the ability to distinguish:
+
+\begin{itemize}
+  \item signal from noise
+  \item mechanism from metaphor
+  \item durable leverage from fashionable novelty
+  \item trustworthy systems from impressive demos
+  \item work that matters from work that merely performs importance
+\end{itemize}
+
+The five recurring questions are:
+
+\begin{enumerate}
+  \item Does this touch reality, or only benchmark theater?
+  \item Does this compound, or reset every hype cycle?
+  \item Does this unlock reusable capability, or only a narrow artifact?
+  \item Does this deepen our model of mind, biology, society, or infrastructure?
+  \item If this succeeds, does it actually matter?
+\end{enumerate}
+
+\section{Knowledge System to Rebuild}
+
+If starting from a high-school baseline, the best order is:
+
+\begin{enumerate}
+  \item mathematics as the language of structure and change
+  \item physics and dynamical systems
+  \item computer science as controlled complexity
+  \item neuroscience and computation
+  \item embodiment and robotics
+  \item biology and augmentation
+  \item institutions, privacy, and inequality
+\end{enumerate}
+
+The unifying lesson is that serious systems are constrained, stateful, adaptive, and embedded in society.
+
+\section{Twelve-Week Operational Plan}
+
+\subsection{How to use the plan}
+
+Each week should include:
+
+\begin{enumerate}
+  \item study
+  \item implementation
+  \item writing
+  \item reflection
+\end{enumerate}
+
+Each week should also produce one judgment artifact: a short note on what became more real or less convincing.
+
+\subsection{Week 1 to Week 4}
+
+\textbf{Week 1: Functions, variables, and modeling}
+
+Move from school math to causal description. Build tiny simulations of linear growth, exponential decay, and threshold switches. Write one page on why a model is a compressed causal story.
+
+\textbf{Week 2: Derivatives, accumulation, and state}
+
+Learn to think in local change and accumulation through time. Implement Euler integration and observe the effect of step size. Write one page on why discretization already trains engineering taste.
+
+\textbf{Week 3: Vectors, matrices, and noisy observations}
+
+Understand structure and uncertainty together. Implement a matrix-based recurrent update and add sensor noise. Write one page on why real systems are structured and noisy.
+
+\textbf{Week 4: LIF from first principles}
+
+Implement a leaky integrate-and-fire neuron from scratch. Sweep time constant and threshold. Write one page on what LIF preserves and what it discards.
+
+\subsection{Week 5 to Week 8}
+
+\textbf{Week 5: Synapses, spike trains, and coding}
+
+Add synaptic filtering and compare fast and slow decay. Build a two-neuron excitatory or inhibitory motif. Write one page on why not all spikes mean the same thing.
+
+\textbf{Week 6: Recurrent circuits and competition}
+
+Study stabilization, competition, and runaway excitation. Build a small recurrent SNN and identify the difference between strong dynamics and parameter abuse. Write one page on why recurrence is power and danger at once.
+
+\textbf{Week 7: Embodiment and closed loops}
+
+Run the embodied prototype and inspect sensory history, action history, and trajectory. Change one body parameter and observe the shift in behavior. Write one page on why bodies compute too.
+
+\textbf{Week 8: Connectomes and structure-constrained models}
+
+Redraw the prototype network into sensory, interneuron, descending, and motor groups. Justify every connection in words. Write one page on why a wiring diagram is not yet a mind.
+
+\subsection{Week 9 to Week 12}
+
+\textbf{Week 9: Plasticity and local learning}
+
+Implement one toy plasticity rule and track how synaptic weights evolve. Write one page on what information a learning rule actually needs.
+
+\textbf{Week 10: Interfaces and hidden arbitrariness}
+
+Inspect the prototype's sensory mapping and action decoder. Identify which parts are principled and which are hand-tuned. Write one page on why interfaces are where truth leaks.
+
+\textbf{Week 11: Trust, privacy, and human stakes}
+
+Design a toy privacy-first memory system for a personal AI companion. Identify abuse paths. Write one page on why trust is an architecture property before it is a policy statement.
+
+\textbf{Week 12: Synthesis and founder-level clarity}
+
+Write one-page architecture memos for Alive, Realize, and Innocence, plus one page on the shared reusable stack. Write one page on what is worth building.
+
+\subsection{Non-negotiable rules}
+
+\begin{enumerate}
+  \item Never let reading replace implementation.
+  \item Never let implementation replace writing.
+  \item Never let ambition excuse vagueness.
+  \item Record confusions explicitly.
+  \item Refuse at least one seductive but shallow idea every two weeks.
+\end{enumerate}
+
+\section{ARI Taste Standards}
+
+Any major direction should pass six tests:
+
+\begin{enumerate}
+  \item reality test
+  \item mechanism test
+  \item reusability test
+  \item trust test
+  \item dignity test
+  \item durability test
+\end{enumerate}
+
+If a direction fails several of these, it should not receive deep commitment.
+
+\subsection{Alive}
+
+\textbf{Human problem}
+
+Loneliness is not only absence of contact. It is absence of witnessed identity, continuity, and trusted presence.
+
+\textbf{Irreducible technical object}
+
+Not a chatbot, but a persistent relational agent with memory, boundaries, continuity, and possibly embodiment.
+
+\textbf{Architecture layers}
+
+\begin{enumerate}
+  \item identity layer with stable persona and versioned self-model
+  \item memory layer with episodic, preference, and relational memory
+  \item interaction layer across text, voice, visual, and possibly embodied channels
+  \item user sovereignty layer with real memory editing, deletion, and export
+  \item trust and safety layer with crisis-sensitive behavior and clear limits
+\end{enumerate}
+
+\textbf{Taste standard}
+
+Prefer continuity over novelty, genuine care over retention tricks, and agency over dependency.
+
+\subsection{Realize}
+
+\textbf{Human problem}
+
+Biological limits appear as disability, decline, suffering, and hard capability ceilings.
+
+\textbf{Irreducible technical object}
+
+Not an enhancement slogan, but a closed-loop augmentation or restoration system grounded in measurable biology.
+
+\textbf{Architecture layers}
+
+\begin{enumerate}
+  \item sensing layer for noisy biological signal acquisition
+  \item interpretation layer with uncertainty-aware decoding and subject adaptation
+  \item intervention layer under strict safety envelopes
+  \item clinical and validation layer with evidence tracking and auditability
+  \item human factors layer for comfort, adherence, and informed use
+\end{enumerate}
+
+\textbf{Taste standard}
+
+Prefer mechanism over spectacle, restoration over theater, and translational seriousness over futurist language.
+
+\subsection{Innocence}
+
+\textbf{Human problem}
+
+Systemic inequality persists when infrastructure is opaque, extractive, and easy to weaponize.
+
+\textbf{Irreducible technical object}
+
+Not a fairness dashboard, but a privacy-first coordination and service infrastructure that preserves agency under power asymmetry.
+
+\textbf{Architecture layers}
+
+\begin{enumerate}
+  \item identity and consent layer
+  \item data boundary layer with encryption and access control
+  \item service orchestration layer across institutions
+  \item user interface layer that remains understandable and accessible
+  \item governance resilience layer against abuse and capture
+\end{enumerate}
+
+\textbf{Taste standard}
+
+Prefer privacy by architecture over policy theater, inclusion as actual usability over rhetoric, and hard trust boundaries over benevolent assumptions.
+
+\section{Shared ARI Core}
+
+The ecosystem should compound through common technical layers:
+
+\begin{enumerate}
+  \item identity and continuity
+  \item privacy and consent
+  \item multimodal interaction
+  \item personal memory and retrieval
+  \item edge and device integration
+  \item safety, auditability, and policy enforcement
+  \item adaptation under user control
+\end{enumerate}
+
+The strategic principle is simple: products differ at the surface, but trust, memory, and control architecture should compound underneath.
+
+\section{Final Standard}
+
+Choose work that is simultaneously:
+
+\begin{itemize}
+  \item real
+  \item deep
+  \item reusable
+  \item worthy
+\end{itemize}
+
+Alive should make companionship more real, not more addictive.
+
+Realize should make augmentation more grounded, not more theatrical.
+
+Innocence should make infrastructure more trustworthy, not more rhetorical.
+
+If a technical choice strengthens those standards, it is probably aligned. If it weakens them, it is probably a distraction even if it is fashionable.
+
+\end{document}
