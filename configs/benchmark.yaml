@@ -1,0 +1,38 @@
+sim:
+  seed: 7
+  dt_ms: 1.0
+  brain_body_sync_ms: 15.0
+  steps: 300
+  arena_radius: 2.0
+  food_position: [1.25, 0.35]
+  sensor_offset: 0.16
+  sensor_angle_deg: 32.0
+  gradient_sigma: 0.75
+  dust_gain: 0.003
+  groom_clean_rate: 0.07
+  max_linear_speed: 0.035
+  max_turn_rate: 0.14
+  hunger_drive: 0.43
+  rewiring_prob: 0.15
+  neural_noise_std: 0.02
+  forward_softclip_center: 0.68
+  forward_softclip_slope: 3.2
+  turn_softclip_gain: 1.3
+  plasticity_lr: 0.015
+  plasticity_decay: 0.01
+  plasticity_reward_scale: 0.5
+  plasticity_clip: 1.8
+  spike_energy_cost: 0.002
+  linear_energy_cost: 0.05
+  turn_energy_cost: 0.03
+  groom_energy_cost: 0.025
+
+study:
+  seeds: [7, 11, 19, 23, 29]
+  modes: [structured, structured_rewired, random_sparse, no_recurrence, structured_plastic]
+  neural_noise_std_sweep: [0.0, 0.02]
+  rewiring_prob_sweep: [0.05, 0.15]
+  hunger_drive_sweep: [0.30, 0.37, 0.43]
+  plasticity_lr_sweep: [0.008, 0.015, 0.025]
+  plasticity_decay_sweep: [0.005, 0.01]
+  output_dir: outputs/benchmark
