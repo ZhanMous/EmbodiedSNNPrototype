@@ -11,6 +11,13 @@ class SimConfig:
     seed: int = 7
     dt_ms: float = 1.0
     brain_body_sync_ms: float = 15.0
+    tau_mem: float = 20.0
+    tau_syn: float = 10.0
+    connectivity_mode: str = "structured"
+    neural_noise_std: float = 0.0
+    rewiring_prob: float = 0.0
+    plasticity_lr: float = 0.01
+    plasticity_decay: float = 0.01
     steps: int = 220
     arena_radius: float = 2.0
     food_position: tuple[float, float] = (1.25, 0.35)

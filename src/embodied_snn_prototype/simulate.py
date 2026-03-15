@@ -22,6 +22,19 @@ class SimulationResult:
     final_dust: float
 
 
+@dataclass
+class EpisodeMetrics:
+    food_eaten: float
+    final_dust: float
+    near_food_ratio: float
+    mean_forward: float
+    mean_abs_turn: float
+    mean_groom: float
+    spike_rate_mean: float
+    energy_proxy: float
+    objective: float
+
+
 def run_closed_loop(config: SimConfig) -> SimulationResult:
     arena = EmbodiedArena(config)
     brain = StructuredLIFBrain(config)
@@ -59,6 +72,42 @@ def run_closed_loop(config: SimConfig) -> SimulationResult:
         spike_history=np.asarray(brain.spike_log, dtype=float),
         food_eaten=float(arena.state.food_eaten),
         final_dust=float(arena.state.dust),
+    )
+
+
+def summarize_episode(result: SimulationResult, config: SimConfig) -> EpisodeMetrics:
+    actions = result.action_history
+    sensory = result.sensory_history
+    rates = result.rate_history
+
+    near_food_ratio = float(np.mean(sensory[:, 3])) if sensory.size else 0.0
+    mean_forward = float(np.mean(actions[:, 0])) if actions.size else 0.0
+    mean_abs_turn = float(np.mean(np.abs(actions[:, 1]))) if actions.size else 0.0
+    mean_groom = float(np.mean(actions[:, 2])) if actions.size else 0.0
+    spike_rate_mean = float(np.mean(rates)) if rates.size else 0.0
+
+    # Small energy proxy encourages useful behavior with parsimonious activity.
+    action_cost = 0.30 * mean_forward + 0.25 * mean_abs_turn + 0.20 * mean_groom
+    spike_cost = 0.0012 * spike_rate_mean
+    energy_proxy = float(action_cost + spike_cost)
+
+    objective = float(
+        result.food_eaten
+        + 0.35 * near_food_ratio
+        - 0.25 * result.final_dust
+        - energy_proxy
+    )
+
+    return EpisodeMetrics(
+        food_eaten=float(result.food_eaten),
+        final_dust=float(result.final_dust),
+        near_food_ratio=near_food_ratio,
+        mean_forward=mean_forward,
+        mean_abs_turn=mean_abs_turn,
+        mean_groom=mean_groom,
+        spike_rate_mean=spike_rate_mean,
+        energy_proxy=energy_proxy,
+        objective=objective,
     )
 
 

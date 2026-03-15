@@ -8,12 +8,13 @@ from .config import SimConfig
 class StructuredLIFBrain:
     def __init__(self, config: SimConfig):
         self.config = config
+        self.rng = np.random.default_rng(config.seed)
         self.num_neurons = 9
         self.v_rest = 0.0
         self.v_reset = 0.0
         self.v_th = 1.0
-        self.tau_mem = 20.0
-        self.tau_syn = 10.0
+        self.tau_mem = config.tau_mem
+        self.tau_syn = config.tau_syn
         self.rate_decay = 0.92
 
         self.v = np.zeros(self.num_neurons, dtype=float)
@@ -39,6 +40,12 @@ class StructuredLIFBrain:
 
         self.w_rec = np.zeros((self.num_neurons, self.num_neurons), dtype=float)
         self._wire_brain()
+
+        self.motor_scale = np.ones(5, dtype=float)
+        if self.config.connectivity_mode == "no_recurrence":
+            self.w_rec[:, :] = 0.0
+        elif self.config.connectivity_mode in {"random_sparse", "structured_plastic"}:
+            self._apply_rewiring()
 
     def _wire_brain(self) -> None:
         left_sensor = 0
@@ -75,9 +82,19 @@ class StructuredLIFBrain:
         self.w_rec[eat, eat] = 0.2
         self.w_rec[groom, groom] = 0.24
 
+    def _apply_rewiring(self) -> None:
+        prob = float(np.clip(self.config.rewiring_prob, 0.0, 1.0))
+        if prob <= 0.0:
+            return
+        mask = self.rng.random(self.w_rec.shape) < prob
+        random_weights = self.rng.normal(loc=0.0, scale=0.55, size=self.w_rec.shape)
+        self.w_rec = np.where(mask, random_weights, self.w_rec)
+
     def step(self, sensory: np.ndarray) -> np.ndarray:
         input_drive = self.w_in @ sensory
         input_drive[6] += self.config.hunger_drive
+        if self.config.neural_noise_std > 0.0:
+            input_drive += self.rng.normal(0.0, self.config.neural_noise_std, size=self.num_neurons)
 
         syn_decay = np.exp(-self.config.dt_ms / self.tau_syn)
         mem_scale = self.config.dt_ms / self.tau_mem
@@ -90,14 +107,22 @@ class StructuredLIFBrain:
         self.spikes = spikes
         self.spike_log.append(spikes.copy())
         self.rate_trace = self.rate_decay * self.rate_trace + (1.0 - self.rate_decay) * spikes * (1000.0 / self.config.dt_ms)
+
+        if self.config.connectivity_mode == "structured_plastic":
+            # Keep adaptation bounded and simple: strengthen eat/forward near food, relax with decay.
+            reward = float(sensory[3])
+            target = np.array([0.0, 0.0, reward, reward, 0.0], dtype=float)
+            self.motor_scale += self.config.plasticity_lr * target
+            self.motor_scale *= (1.0 - self.config.plasticity_decay)
+            self.motor_scale = np.clip(self.motor_scale, 0.6, 1.4)
         return spikes
 
     def decode_action(self) -> dict[str, float]:
-        turn_left = self.rate_trace[4] / 30.0
-        turn_right = self.rate_trace[5] / 30.0
-        forward = self.rate_trace[6] / 35.0
-        eat = self.rate_trace[7] / 30.0
-        groom = self.rate_trace[8] / 25.0
+        turn_left = self.motor_scale[0] * self.rate_trace[4] / 30.0
+        turn_right = self.motor_scale[1] * self.rate_trace[5] / 30.0
+        forward = self.motor_scale[2] * self.rate_trace[6] / 35.0
+        eat = self.motor_scale[3] * self.rate_trace[7] / 30.0
+        groom = self.motor_scale[4] * self.rate_trace[8] / 25.0
 
         return {
             "turn": float(np.clip(turn_left - turn_right, -1.0, 1.0)),

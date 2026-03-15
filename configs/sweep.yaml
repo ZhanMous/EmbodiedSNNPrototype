@@ -1,0 +1,11 @@
+base_config: configs/quick.yaml
+
+sweep:
+  tau_mem: [12.0, 20.0, 28.0]
+  hunger_drive: [0.40, 0.55, 0.70]
+  brain_body_sync_ms: [10.0, 15.0, 20.0]
+  seeds: [1, 2, 3, 4, 5]
+
+outputs:
+  csv: outputs/sweeps/metrics.csv
+  heatmap: outputs/sweeps/food_eaten_heatmap.png
