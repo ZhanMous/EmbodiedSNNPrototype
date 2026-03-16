@@ -17,6 +17,12 @@ outputs/**/*.png
 outputs/**/*.pdf
 outputs/**/*.aux
 outputs/**/*.toc
+outputs/**/*.csv
+outputs/plasticity_compare/
+outputs/plasticity_compare_retuned/
+outputs/plasticity_compare_retuned_v2/
+outputs/plasticity_compare_retuned_v3/
+outputs/sweeps/
 
 # editor
 .vscode/

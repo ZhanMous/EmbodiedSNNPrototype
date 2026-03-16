@@ -10,6 +10,8 @@ class StructuredLIFBrain:
         self.config = config
         self.rng = np.random.default_rng(config.seed)
         self.num_neurons = 9
+        self.motor_neuron_start = 4
+        self.motor_neuron_count = 5
         self.v_rest = 0.0
         self.v_reset = 0.0
         self.v_th = 1.0
@@ -22,6 +24,14 @@ class StructuredLIFBrain:
         self.spikes = np.zeros(self.num_neurons, dtype=float)
         self.rate_trace = np.zeros(self.num_neurons, dtype=float)
         self.spike_log: list[np.ndarray] = []
+        self.readout_trace = np.zeros(self.motor_neuron_count, dtype=float)
+        self.post_trace = np.zeros(self.motor_neuron_count, dtype=float)
+        self.base_readout_weights = np.zeros((self.motor_neuron_count, self.motor_neuron_count), dtype=float)
+        self.readout_delta = np.zeros((self.motor_neuron_count, self.motor_neuron_count), dtype=float)
+        self.readout_weights = np.zeros((self.motor_neuron_count, self.motor_neuron_count), dtype=float)
+        self.readout_plastic_mask = np.zeros((self.motor_neuron_count, self.motor_neuron_count), dtype=float)
+        self.readout_history: list[np.ndarray] = []
+        self.reward_log: list[float] = []
 
         self.w_in = np.array(
             [
@@ -40,12 +50,13 @@ class StructuredLIFBrain:
 
         self.w_rec = np.zeros((self.num_neurons, self.num_neurons), dtype=float)
         self._wire_brain()
-
-        self.motor_scale = np.ones(5, dtype=float)
+        self._init_readout_weights()
         if self.config.connectivity_mode == "no_recurrence":
             self.w_rec[:, :] = 0.0
         elif self.config.connectivity_mode in {"random_sparse", "structured_plastic"}:
             self._apply_rewiring()
+        elif self.config.connectivity_mode == "plastic_readout":
+            pass
 
     def _wire_brain(self) -> None:
         left_sensor = 0
@@ -90,6 +101,18 @@ class StructuredLIFBrain:
         random_weights = self.rng.normal(loc=0.0, scale=0.55, size=self.w_rec.shape)
         self.w_rec = np.where(mask, random_weights, self.w_rec)
 
+    def _init_readout_weights(self) -> None:
+        base_diag = np.array([1.0 / 30.0, 1.0 / 30.0, 1.0 / 35.0, 1.0 / 30.0, 1.0 / 25.0], dtype=float)
+        self.base_readout_weights[:, :] = 0.0
+        np.fill_diagonal(self.base_readout_weights, base_diag)
+        self.readout_delta[:, :] = 0.0
+        self.readout_plastic_mask[:, :] = 0.0
+        self.readout_plastic_mask[2, 2] = 1.0
+        self.readout_plastic_mask[3, 3] = 1.0
+        self.readout_plastic_mask[4, 4] = 1.0
+        self.readout_weights = self.base_readout_weights + self.readout_delta
+        self.readout_history = [self.readout_weights.copy()]
+
     def step(self, sensory: np.ndarray) -> np.ndarray:
         input_drive = self.w_in @ sensory
         input_drive[6] += self.config.hunger_drive
@@ -107,22 +130,63 @@ class StructuredLIFBrain:
         self.spikes = spikes
         self.spike_log.append(spikes.copy())
         self.rate_trace = self.rate_decay * self.rate_trace + (1.0 - self.rate_decay) * spikes * (1000.0 / self.config.dt_ms)
-
-        if self.config.connectivity_mode == "structured_plastic":
-            # Keep adaptation bounded and simple: strengthen eat/forward near food, relax with decay.
-            reward = float(sensory[3])
-            target = np.array([0.0, 0.0, reward, reward, 0.0], dtype=float)
-            self.motor_scale += self.config.plasticity_lr * target
-            self.motor_scale *= (1.0 - self.config.plasticity_decay)
-            self.motor_scale = np.clip(self.motor_scale, 0.6, 1.4)
+        motor_spikes = spikes[self.motor_neuron_start : self.motor_neuron_start + self.motor_neuron_count]
+        self.readout_trace = self.config.readout_trace_decay * self.readout_trace + motor_spikes
         return spikes
 
+    def apply_reward_modulated_plasticity(self, sensory: np.ndarray, action: dict[str, float], delta_food: float, delta_dust: float) -> float:
+        if self.config.connectivity_mode not in {"structured_plastic", "plastic_readout"}:
+            self.reward_log.append(0.0)
+            self.readout_history.append(self.readout_weights.copy())
+            return 0.0
+
+        taste_left = float(sensory[0])
+        taste_right = float(sensory[1])
+        taste_mean = 0.5 * (taste_left + taste_right)
+        taste_delta = taste_left - taste_right
+        turn_alignment = action["turn"] * np.sign(taste_delta) * abs(taste_delta)
+
+        reward = (
+            self.config.reward_food_scale * delta_food
+            + self.config.reward_near_food_scale * float(sensory[3])
+            + self.config.reward_taste_scale * taste_mean
+            + self.config.reward_turn_alignment_scale * turn_alignment
+            - self.config.reward_dust_scale * max(delta_dust, 0.0)
+            - self.config.reward_energy_scale
+            * (action["forward"] + 0.5 * abs(action["turn"]) + 0.35 * action["groom"] + 0.2 * action["eat"])
+        )
+        learning_signal = max(reward, 0.0)
+
+        post_activity = np.array(
+            [
+                max(action["turn"], 0.0),
+                max(-action["turn"], 0.0),
+                action["forward"],
+                action["eat"],
+                action["groom"],
+            ],
+            dtype=float,
+        )
+        self.post_trace = self.config.readout_trace_decay * self.post_trace + post_activity
+        eligibility = np.outer(self.post_trace, self.readout_trace)
+
+        self.readout_delta *= (1.0 - self.config.plasticity_decay)
+        self.readout_delta += self.config.plasticity_lr * learning_signal * eligibility * self.readout_plastic_mask
+        self.readout_delta = np.clip(self.readout_delta, 0.0, self.config.readout_weight_max)
+        self.readout_weights = np.clip(self.base_readout_weights + self.readout_delta, 0.0, self.config.readout_weight_max)
+
+        self.reward_log.append(float(reward))
+        self.readout_history.append(self.readout_weights.copy())
+        return float(reward)
+
     def decode_action(self) -> dict[str, float]:
-        turn_left = self.motor_scale[0] * self.rate_trace[4] / 30.0
-        turn_right = self.motor_scale[1] * self.rate_trace[5] / 30.0
-        forward = self.motor_scale[2] * self.rate_trace[6] / 35.0
-        eat = self.motor_scale[3] * self.rate_trace[7] / 30.0
-        groom = self.motor_scale[4] * self.rate_trace[8] / 25.0
+        motor_rates = self.rate_trace[self.motor_neuron_start : self.motor_neuron_start + self.motor_neuron_count]
+        readout = self.readout_weights @ motor_rates
+        turn_left = readout[0]
+        turn_right = readout[1]
+        forward = readout[2]
+        eat = readout[3]
+        groom = readout[4]
 
         return {
             "turn": float(np.clip(turn_left - turn_right, -1.0, 1.0)),

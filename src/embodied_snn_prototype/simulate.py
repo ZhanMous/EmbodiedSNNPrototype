@@ -18,6 +18,8 @@ class SimulationResult:
     action_history: np.ndarray
     rate_history: np.ndarray
     spike_history: np.ndarray  # shape (brain_steps, num_neurons), brain_steps = steps * sync_steps
+    reward_history: np.ndarray
+    readout_history: np.ndarray
     food_eaten: float
     final_dust: float
 
@@ -45,6 +47,7 @@ def run_closed_loop(config: SimConfig) -> SimulationResult:
     sensory_history = []
     action_history = []
     rate_history = []
+    reward_history = []
 
     for _ in range(config.steps):
         sensory = arena.sense()
@@ -52,17 +55,26 @@ def run_closed_loop(config: SimConfig) -> SimulationResult:
             brain.step(sensory)
 
         action = brain.decode_action()
+        prev_dust = arena.state.dust
+        prev_food_eaten = arena.state.food_eaten
         state = arena.step(
             linear_drive=action["forward"],
             turn_drive=action["turn"],
             groom_drive=action["groom"],
             eat_drive=action["eat"],
         )
+        reward = brain.apply_reward_modulated_plasticity(
+            sensory=sensory,
+            action=action,
+            delta_food=state.food_eaten - prev_food_eaten,
+            delta_dust=state.dust - prev_dust,
+        )
 
         trajectory.append([state.x, state.y, state.heading, state.dust, state.food_eaten])
         sensory_history.append(sensory.copy())
         action_history.append([action["forward"], action["turn"], action["groom"], action["eat"]])
         rate_history.append(brain.rate_trace.copy())
+        reward_history.append(reward)
 
     return SimulationResult(
         trajectory=np.asarray(trajectory, dtype=float),
@@ -70,6 +82,8 @@ def run_closed_loop(config: SimConfig) -> SimulationResult:
         action_history=np.asarray(action_history, dtype=float),
         rate_history=np.asarray(rate_history, dtype=float),
         spike_history=np.asarray(brain.spike_log, dtype=float),
+        reward_history=np.asarray(reward_history, dtype=float),
+        readout_history=np.asarray(brain.readout_history, dtype=float),
         food_eaten=float(arena.state.food_eaten),
         final_dust=float(arena.state.dust),
     )

@@ -18,6 +18,14 @@ class SimConfig:
     rewiring_prob: float = 0.0
     plasticity_lr: float = 0.01
     plasticity_decay: float = 0.01
+    readout_trace_decay: float = 0.90
+    readout_weight_max: float = 0.08
+    reward_food_scale: float = 12.0
+    reward_near_food_scale: float = 0.08
+    reward_taste_scale: float = 0.10
+    reward_turn_alignment_scale: float = 0.06
+    reward_dust_scale: float = 0.04
+    reward_energy_scale: float = 0.008
     steps: int = 220
     arena_radius: float = 2.0
     food_position: tuple[float, float] = (1.25, 0.35)
