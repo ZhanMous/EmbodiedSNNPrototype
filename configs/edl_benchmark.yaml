@@ -1,0 +1,29 @@
+sim:
+  seed: 7
+  steps: 220
+  dt_ms: 1.0
+  brain_body_sync_ms: 15.0
+  connectivity_mode: structured
+  neural_noise_std: 0.0
+  rewiring_prob: 0.0
+  plasticity_lr: 0.01
+  plasticity_decay: 0.01
+
+evolution:
+  population_size: 20
+  generations: 12
+  mutation_rate: 0.18
+  mutation_scale: 0.08
+  crossover_rate: 0.75
+  elite_count: 2
+  tournament_size: 3
+  seed: 42
+
+benchmark:
+  train_episodes: 4
+  eval_episodes: 6
+  train_seed_stride: 10
+  eval_seed_offset: 1000
+
+seeds: [3, 7, 11, 19]
+output_dir: outputs/edl_benchmark

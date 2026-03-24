@@ -22,6 +22,7 @@ It is not a fruit-fly emulator. It is a controlled research scaffold that keeps 
 ## Project layout
 
 - `configs/quick.yaml`: default simulation configuration
+- `configs/edl_benchmark.yaml`: EDL framework benchmark configuration
 - `docs/reading_list.md`: annotated reading list
 - `docs/foundations_and_taste.md`: beginner-to-founder knowledge map and taste framework
 - `docs/twelve_month_plan.md`: one-year training plan from fundamentals to architecture judgment
@@ -31,8 +32,14 @@ It is not a fruit-fly emulator. It is a controlled research scaffold that keeps 
 - `docs/ari_founder_handbook.tex`: LaTeX source for a mobile-friendly PDF handbook
 - `docs/ari_founder_book.tex`: expanded founder-book edition with diagrams and richer tablet-friendly layout
 - `docs/prototype_roadmap.md`: staged research roadmap
+- `docs/EDL_QUICK_REFERENCE.md`: **EDL framework quick start (演化-发育-学习)**
+- `docs/EDL_INTEGRATION_CHECKLIST.md`: **EDL integration guide for downstream projects**
+- `docs/EDL_COMPLETION_REPORT.md`: **EDL framework full report**
 - `scripts/run_demo.py`: entry point for a short demo run
+- `scripts/run_edl_benchmark.py`: **EDL benchmark runner**
+- `scripts/generate_edl_analysis.py`: **EDL performance analysis report generator**
 - `src/embodied_snn_prototype/`: reusable package code
+- `src/embodied_snn_prototype/edl.py`: **EDL framework (532 lines, 4 optimization methods)**
 - `tests/test_smoke.py`: minimal smoke test
 
 ## Quick start
@@ -48,6 +55,35 @@ pytest -q
 
 The demo prints summary metrics and writes a trajectory figure to `outputs/trajectory.png`.
 
+## EDL Framework - Unified Evolution-Development-Learning optimization
+
+**New in v1.1**: EDL framework for comparing 4 SNN optimization strategies:
+
+```bash
+# Run EDL benchmark (4 methods, 3 trials, ~1 minute)
+python scripts/run_edl_benchmark.py --config configs/edl_benchmark.yaml
+
+# Analyze results  
+python scripts/generate_edl_analysis.py
+# Output: outputs/edl_analysis/{report.md, report.json}
+```
+
+**Results** (embodied control task):
+- baseline (plasticity only): 21.77 ± 4.02
+- direct_evolution (GA readout): 82.07 ± 12.69 (+277%)
+- **crn_development (GA + developmental coding): 91.99 ± 0.00 (+323%)** ✓
+
+**Quick integration** (3 steps to add EDL to your project):
+1. Copy `src/embodied_snn_prototype/edl.py` to your project
+2. Define a `rollout_fn(network, genome, seed)` for your task
+3. Call `run_edl_benchmark(rollout_fn, config)` 
+
+**Documentation**:
+- [EDL Quick Reference](docs/EDL_QUICK_REFERENCE.md) - 1-page cheat sheet
+- [EDL Integration Guide](docs/EDL_INTEGRATION_CHECKLIST.md) - full integration steps for Neuro-Symbiosis, PrivEnergyBench, MedSparseSNN
+- [EDL Completion Report](docs/EDL_COMPLETION_REPORT.md) - project summary, meta-insights, roadmap
+- [Neuro-Symbiosis Example](docs/neuro_symbiosis_edl_adapter.py) - sample BCI adaptation
+
 ## Why this prototype is useful
 
 This scaffold gives you a place to test several questions that matter for your SNN work:
@@ -56,6 +92,7 @@ This scaffold gives you a place to test several questions that matter for your S
 - how LIF timescales interact with sensorimotor loop timing
 - when hand-designed readout mappings stop being sufficient
 - how to replace fixed motor mappings with learned or adaptive interfaces
+- **[NEW] how evolutionary search, developmental encoding, and plasticity interact across timescales**
 
 ## Founder note
 
