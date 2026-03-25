@@ -423,7 +423,15 @@ def _write_csv(path: Path, rows: list[dict[str, float | int | str]]) -> None:
     if not rows:
         return
     path.parent.mkdir(parents=True, exist_ok=True)
-    fieldnames = list(rows[0].keys())
+    # Some methods add optional keys (e.g., best_lr/best_decay),
+    # so we need a union of all keys to avoid csv.DictWriter errors.
+    fieldnames: list[str] = []
+    seen: set[str] = set()
+    for row in rows:
+        for key in row.keys():
+            if key not in seen:
+                seen.add(key)
+                fieldnames.append(key)
     with path.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=fieldnames)
         writer.writeheader()

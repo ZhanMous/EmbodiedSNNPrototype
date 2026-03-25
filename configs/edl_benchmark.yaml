@@ -25,5 +25,5 @@ benchmark:
   train_seed_stride: 10
   eval_seed_offset: 1000
 
-seeds: [3, 7, 11, 19]
+seeds: [3, 7, 11, 19, 23, 31, 43, 59, 67, 83]  # Increased to n=10 for variance verification
 output_dir: outputs/edl_benchmark
