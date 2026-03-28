@@ -1,0 +1,111 @@
+{
+  "base_config": {
+    "seed": 7,
+    "dt_ms": 1.0,
+    "brain_body_sync_ms": 15.0,
+    "tau_mem": 20.0,
+    "tau_syn": 10.0,
+    "connectivity_mode": "structured",
+    "neural_noise_std": 0.0,
+    "rewiring_prob": 0.0,
+    "plasticity_lr": 0.01,
+    "plasticity_decay": 0.01,
+    "readout_trace_decay": 0.9,
+    "readout_weight_max": 0.08,
+    "reward_food_scale": 12.0,
+    "reward_near_food_scale": 0.08,
+    "reward_taste_scale": 0.1,
+    "reward_turn_alignment_scale": 0.06,
+    "reward_dust_scale": 0.04,
+    "reward_energy_scale": 0.008,
+    "steps": 220,
+    "arena_radius": 2.0,
+    "food_position": [
+      1.25,
+      0.35
+    ],
+    "sensor_offset": 0.16,
+    "sensor_angle_deg": 32.0,
+    "gradient_sigma": 0.75,
+    "dust_gain": 0.003,
+    "groom_clean_rate": 0.07,
+    "max_linear_speed": 0.035,
+    "max_turn_rate": 0.14,
+    "hunger_drive": 0.55
+  },
+  "evolution_config": {
+    "population_size": 8,
+    "generations": 3,
+    "mutation_rate": 0.2,
+    "mutation_scale": 0.05,
+    "crossover_rate": 0.7,
+    "elite_count": 2,
+    "tournament_size": 2,
+    "seed": 42
+  },
+  "benchmark_config": {
+    "train_episodes": 2,
+    "eval_episodes": 2,
+    "train_seed_stride": 5,
+    "eval_seed_offset": 100,
+    "surrogate_steps": 120,
+    "surrogate_lr": 0.03,
+    "surrogate_spike_slope": 12.0,
+    "surrogate_env_slope": 14.0,
+    "surrogate_grad_clip": 5.0
+  },
+  "summary": [
+    {
+      "method": "plastic_only",
+      "n": 2.0,
+      "objective_mean": -0.42104371658437567,
+      "objective_std": 0.0,
+      "food_eaten_mean": 0.36000000000000004,
+      "final_dust_mean": 0.04800000000000001,
+      "energy_proxy_mean": 0.7976800802207393
+    },
+    {
+      "method": "evo_learning",
+      "n": 2.0,
+      "objective_mean": -0.48123840501986226,
+      "objective_std": 0.0038890475475206656,
+      "food_eaten_mean": 0.0,
+      "final_dust_mean": 0.003,
+      "energy_proxy_mean": 0.48048840501986223
+    },
+    {
+      "method": "ea_readout",
+      "n": 2.0,
+      "objective_mean": -0.4839472006093325,
+      "objective_std": 5.82320871954347e-05,
+      "food_eaten_mean": 0.0,
+      "final_dust_mean": 0.003,
+      "energy_proxy_mean": 0.48319720060933247
+    },
+    {
+      "method": "crn_development",
+      "n": 2.0,
+      "objective_mean": -0.5634584589802902,
+      "objective_std": 0.015871097028835334,
+      "food_eaten_mean": 0.0,
+      "final_dust_mean": 0.003,
+      "energy_proxy_mean": 0.5627084589802902
+    },
+    {
+      "method": "surrogate_backprop",
+      "n": 2.0,
+      "objective_mean": -0.6911253261661774,
+      "objective_std": 0.11965823707610587,
+      "food_eaten_mean": 0.08,
+      "final_dust_mean": 0.036000000000000004,
+      "energy_proxy_mean": 0.7684889625298137
+    }
+  ],
+  "recommendation": [
+    "Top method in this run: plastic_only (objective_mean=-0.4210).",
+    "Use objective_mean as primary ranking, and keep food_eaten_mean + energy_proxy_mean as secondary constraints.",
+    "CRN beats plain EA when objective_mean is higher at similar energy_proxy_mean; this suggests developmental encoding helps search regularization.",
+    "If evo_learning is top-1 or top-2, prioritize evolution for initialization + local plasticity for adaptation in downstream projects.",
+    "For cross-project transfer, keep the optimizer unchanged and only replace the rollout objective adapter."
+  ]
+}

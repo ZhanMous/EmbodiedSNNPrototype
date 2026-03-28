@@ -27,7 +27,9 @@ def load_study_config(
     if "food_position" in sim_raw:
         sim_raw["food_position"] = tuple(sim_raw["food_position"])
 
-    sim_config = SimConfig(**sim_raw)
+        from dataclasses import fields
+        allowed = {field.name for field in fields(SimConfig)}
+        sim_config = SimConfig(**{key: value for key, value in sim_raw.items() if key in allowed})
     seeds = [int(s) for s in study_raw.get("seeds", [7, 11, 19, 23])]
     modes = [str(m) for m in study_raw.get("modes", ["structured", "structured_rewired", "random_sparse", "no_recurrence", "structured_plastic"])]
     noise_values = [float(v) for v in study_raw.get("neural_noise_std_sweep", [sim_config.neural_noise_std])]

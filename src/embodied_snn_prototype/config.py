@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from dataclasses import fields
 from pathlib import Path
 
 import yaml
@@ -44,4 +45,6 @@ class SimConfig:
             raw = yaml.safe_load(handle) or {}
         if "food_position" in raw:
             raw["food_position"] = tuple(raw["food_position"])
-        return cls(**raw)
+        allowed = {field.name for field in fields(cls)}
+        filtered = {key: value for key, value in raw.items() if key in allowed}
+        return cls(**filtered)
